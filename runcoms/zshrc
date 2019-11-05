@@ -1,13 +1,94 @@
-#
-# Executes commands at the start of an interactive session.
-#
-# Authors:
-#   Sorin Ionescu <sorin.ionescu@gmail.com>
-#
+#!/bin/sh
 
-# Source Prezto.
+# source Prezto
+
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 fi
 
-# Customize to your needs...
+# gnu utils
+
+export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
+
+# customize to your needs...
+
+for config_file ($HOME/.yadr/zsh/*.zsh) source $config_file
+
+# path
+
+export PATH="$PATH:/Users/cbattaglia/.amplify/multitool/bin"
+
+# nvm
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+autoload -U add-zsh-hook
+load-nvmrc() {
+  local node_version="$(nvm version)"
+  local nvmrc_path="$(nvm_find_nvmrc)"
+
+  if [ -n "$nvmrc_path" ]; then
+    local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
+
+    if [ "$nvmrc_node_version" = "N/A" ]; then
+      nvm install
+    elif [ "$nvmrc_node_version" != "$node_version" ]; then
+      nvm use
+    fi
+  elif [ "$node_version" != "$(nvm version default)" ]; then
+    echo "Reverting to nvm default version"
+    nvm use default
+  fi
+}
+add-zsh-hook chpwd load-nvmrc
+load-nvmrc
+
+# pyenv
+
+eval "$(pyenv init - zsh --no-rehash)"
+
+# sdkman
+
+export SDKMAN_DIR="/Users/cbattaglia/.sdkman"
+[[ -s "/Users/cbattaglia/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/cbattaglia/.sdkman/bin/sdkman-init.sh"
+
+# zlib
+
+export LDFLAGS="${LDFLAGS} -L/usr/local/opt/zlib/lib"
+export CPPFLAGS="${CPPFLAGS} -I/usr/local/opt/zlib/include"
+export PKG_CONFIG_PATH="${PKG_CONFIG_PATH} /usr/local/opt/zlib/lib/pkgconfig"
+
+# sqlite
+
+export LDFLAGS="${LDFLAGS} -L/usr/local/opt/sqlite/lib"
+export CPPFLAGS="${CPPFLAGS} -I/usr/local/opt/sqlite/include"
+export PKG_CONFIG_PATH="${PKG_CONFIG_PATH} /usr/local/opt/sqlite/lib/pkgconfig"
+
+# tkinter
+
+export LDFLAGS="${LDFLAGS} -L/usr/local/opt/tcl-tk/lib"
+export CPPFLAGS="${CPPFLAGS} -I/usr/local/opt/tcl-tk/include"
+export PKG_CONFIG_PATH="${PKG_CONFIG_PATH} /usr/local/opt/tcl-tk/lib/pkgconfig"
+export PATH="/usr/local/opt/tcl-tk/bin:$PATH"
+
+# terraform
+
+export PATH="/usr/local/opt/terraform@0.11/bin:$PATH"
+export PATH="/Users/cbattaglia/projects/amplify/terraformw/bin:$PATH"
+
+# readline
+
+export LDFLAGS="-L/usr/local/opt/readline/lib"
+export CPPFLAGS="-I/usr/local/opt/readline/include"
+
+# custom aliases
+
+alias trash="rmtrash"
+alias del="rmtrash"
+
+alias rm="echo Use 'del', or the full path i.e. '/bin/rm'"
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
