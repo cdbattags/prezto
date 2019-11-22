@@ -49,6 +49,10 @@ load-nvmrc
 
 eval "$(pyenv init - zsh --no-rehash)"
 
+# rust
+
+export PATH="$HOME/.cargo/bin:$PATH"
+
 # sdkman
 
 export SDKMAN_DIR="/Users/cbattaglia/.sdkman"
